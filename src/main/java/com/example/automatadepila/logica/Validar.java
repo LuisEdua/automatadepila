@@ -33,7 +33,10 @@ public class Validar {
         productions.put("SP", "PARC COF");
         productions.put("COF", "CORI CONF");
         productions.put("CONF", "CONTENIDOF+ CORC");
-        productions.put("CONTENIDOF", "L+ M | PRP PI");
+        productions.put("CONTENIDOF", "L+ M | PRP PI | PRI GV | PRSQ ISQ");
+        productions.put("ISQ", "PARI O");
+        productions.put("O", "PALABRAS PARC");
+        productions.put("GV", "SMM L+");
         productions.put("PI", "PARI PFP");
         productions.put("PFP", "DAP+ PARC");
         productions.put("DAP", "L+ C? | ST C?");
@@ -60,7 +63,10 @@ public class Validar {
         productions.put("PRF", "func");
         productions.put("PRC", "class");
         productions.put("PRM", "main");
+        productions.put("SMM", ">>");
+        productions.put("PRI", "in");
         productions.put("PRP", "println | print");
+        productions.put("PRSQ", "sqrt");
     }
     private String respuesta = "";
 
@@ -96,7 +102,8 @@ public class Validar {
         .replaceAll("\\{", " { ")
         .replaceAll("\\}", " } ")
         .replaceAll("\\(", " ( ")
-        .replaceAll("\\)", " ) ");
+        .replaceAll("\\)", " ) ")
+        .replaceAll(">>", " >> ");
 
         String [] words = string.split("\\s+");
         respuesta += "Pila inicial: " + stack + "\n";
@@ -164,6 +171,18 @@ public class Validar {
                         stack.push("print");
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
+                    }else if(words[i].matches("in")){
+                        stack.push("GV");
+                        stack.push("PRI");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+
+                    }else if(words[i].matches("sqrt")){
+                        stack.push("ISQ");
+                        stack.push("PRSQ");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+
                     }else if (Character.isLetter(words[i].charAt(0))){
                         stack.push("M");
                         stack.push("L+");
@@ -360,13 +379,16 @@ public class Validar {
                         return ("Cadena no valida");
                     }
                 }else if(X.equals("PALABRAS")){
+                    stack.pop();
                     String productions = getProduction("PALABRAS");
                     String[] production = productions.split("\\|");
                     String[] symbols0 = production[0].split("\\s+");
                     if (words[i].matches(symbols0[0])){
                         stack.push("L+");
                     } else if (Character.isDigit(words[i].charAt(0))){
-                        stack.push("N?");
+                        if(words[i+1].matches(getProduction("P"))){
+                            stack.push("N");
+                        }
                         stack.push("D+");
                     } else {
                         respuesta += stack + "\n";
