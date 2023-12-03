@@ -22,6 +22,12 @@ public class Validar {
         productions.put("COC", "CORI CONC");
         productions.put("CONC", "CONTENIDOC+ CORC");
         productions.put("CONTENIDOC", "L+ M | PRF FCM | PRF FC");
+        productions.put("FC", "FN COF");
+        productions.put("FN", "L+ PAIF");
+        productions.put("PAIF", "PARI PACF");
+        productions.put("PACF", "PF? PARC");
+        productions.put("MF", "C L+");
+        productions.put("PF", "L+ MF*");
         productions.put("FCM", "PRM FMP");
         productions.put("FMP", "PARI SP");
         productions.put("SP", "PARC COF");
@@ -67,6 +73,7 @@ public class Validar {
 
         int nPalabras = 0;
         int ncontenidosC = 0;
+        int ncontenidosF = 0;
 
         stack.clear();
 
@@ -74,8 +81,6 @@ public class Validar {
         stack.push("SC");
 
         int i = 0;
-
-        boolean punto = false;
 
         String X;
 
@@ -98,7 +103,8 @@ public class Validar {
             if (X.equals("$")) {
                 return ("La cadena es aceptada");
             }
-            
+            System.out.println(stack);
+            System.out.println(X);
             
             if (isTerminal(X)) {
                 if (X != null && (Pattern.matches(X, words[i]) || X.matches(words[i]))) {
@@ -107,14 +113,26 @@ public class Validar {
                     resultado.setText(respuesta);
                     i++;
                 }else if(X.equals("CONTENIDOF+")){
-                    System.out.println(words[i].matches("contenidof"));
                     if (words[i].matches("contenidof")){
-                        System.out.println("entro");
+                        stack.pop();
                         stack.push("CONTENIDOF");
+                        ncontenidosF++;
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    }else if(ncontenidosF == 0){
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                        return ("Cadena no valida");
                     }else{
-                        System.out.println("Eliminar");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                        ncontenidosF = 0;
                         stack.pop();
                     }
+                }else if(X.equals("PF?")){
+
+                }else if(X.equals("MF*")){
+
                 }else if(X.equals("L+")){
                     String cadena = words[i];
                     for (int j = 0; j < cadena.length(); j++) {
@@ -226,6 +244,7 @@ public class Validar {
                             stack.push("FC");
                             stack.push("PRF");
                         }
+                        ncontenidosC++;
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
                     }else if (Character.isLetter(words[i].charAt(0))){
@@ -233,6 +252,7 @@ public class Validar {
                         stack.push("M");
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
+                        ncontenidosC++;
                     }else {
                         if(ncontenidosC == 0){
                             stack.pop();
@@ -240,6 +260,7 @@ public class Validar {
                             resultado.setText(respuesta);
                             return ("Cadena no valida");
                         }
+                        ncontenidosC = 0;
                         stack.pop();
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
