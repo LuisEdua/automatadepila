@@ -33,7 +33,13 @@ public class Validar {
         productions.put("SP", "PARC COF");
         productions.put("COF", "CORI CONF");
         productions.put("CONF", "CONTENIDOF+ CORC");
-        productions.put("CONTENIDOF", "L+ M | PRP PI | PRI GV | PRSQ ISQ");
+        productions.put("CONTENIDOF", "L+ M | PRP PI | PRI GV | PRSQ ISQ | CONW COF | DCON CONW");
+        productions.put("DCON", "PRD COF");
+        productions.put("CONW", "PRW CON");
+        productions.put("CON", "PARI COND");
+        productions.put("COND", "L+ PARC | LE DAT");
+        productions.put("DAT", "V PARC");
+        productions.put("LE", "L+ EE");
         productions.put("ISQ", "PARI O");
         productions.put("O", "PALABRAS PARC");
         productions.put("GV", "SMM L+");
@@ -53,6 +59,7 @@ public class Validar {
         productions.put("COMILLAS", "\\\"");
         productions.put("D", "[0-9]");
         productions.put("P", "\\.");
+        productions.put("EE", "== | != | >= | <=");
         productions.put("E", "=");
         productions.put("C", ",");
         productions.put("PARI", "\\(");
@@ -67,6 +74,8 @@ public class Validar {
         productions.put("PRI", "in");
         productions.put("PRP", "println | print");
         productions.put("PRSQ", "sqrt");
+        productions.put("PRW", "while");
+        productions.put("PRD", "do");
     }
     private String respuesta = "";
 
@@ -83,7 +92,6 @@ public class Validar {
 
         int nPalabras = 0;
         int ncontenidosC = 0;
-        int ncontenidosF = 0;
         int nDats = 0;
 
         stack.clear();
@@ -98,7 +106,6 @@ public class Validar {
         string = string.replaceAll("\\." , " . ")
         .replaceAll("\"", " \" ")
         .replaceAll(",", " , ")
-        .replaceAll("=", " = ")
         .replaceAll("\\{", " { ")
         .replaceAll("\\}", " } ")
         .replaceAll("\\(", " ( ")
@@ -161,7 +168,17 @@ public class Validar {
                         resultado.setText(respuesta);
                     }
                 }else if(X.equals("CONTENIDOF+")){
-                    if (words[i].matches("println")){
+                    if(words[i].matches("while")){
+                        stack.push("COF");
+                        stack.push("CONW");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    }else if (words[i].matches("do")){
+                        stack.push("CONW");
+                        stack.push("DCON");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    }else if (words[i].matches("println")){
                         stack.push("PI");
                         stack.push("println");
                         respuesta += stack + "\n";
@@ -188,15 +205,9 @@ public class Validar {
                         stack.push("L+");
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
-                        ncontenidosF++;
-                    }else if(ncontenidosF == 0){
-                        respuesta += stack + "\n";
-                        resultado.setText(respuesta);
-                        return ("Cadena no valida");
                     }else{
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
-                        ncontenidosF = 0;
                         stack.pop();
                     }
                 }else if(X.equals("L+")){
@@ -351,6 +362,40 @@ public class Validar {
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
                     }
+                }else if(X.equals("EE")){
+                    stack.pop();
+                    if(words[i].equals("==")){
+                        stack.push("==");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    } else if(words[i].equals("!=")){
+                        stack.push("!=");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    } else if(words[i].equals(">=")){
+                        stack.push(">=");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    } else if(words[i].equals("<=")){
+                        stack.push("<=");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    } else {
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                        return ("Cadena no valida");
+                    }
+                }else if (X.equals("COND")){
+                    stack.pop();
+                    if(words[i+1].matches("==") || words[i+1].matches("!=") || words[i+1].matches(">=") || words[i+1].matches("<=")){
+                        stack.push("DAT");
+                        stack.push("LE");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    } else if (words[i+1].matches(getProduction("PARC"))){
+                        stack.push("PARC");
+                        stack.push("L+");
+                    }
                 }else if(X.equals("PARAMS")){
                     if (Character.isLetter(words[i].charAt(0))){
                         stack.pop();
@@ -422,7 +467,9 @@ public class Validar {
                         i++;
                     }else if (Character.isDigit(words[i].charAt(0))){
                         stack.pop();
-                        stack.push("N?");
+                        if(words[i+1].matches(getProduction("P"))){
+                            stack.push("N");
+                        }
                         stack.push("D+");
                     }else {
                         respuesta += stack + "\n";
