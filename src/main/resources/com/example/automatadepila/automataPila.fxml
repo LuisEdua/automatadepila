@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.automatadepila.controllers.AutomataPilaController">
+   <children>
+      <TextArea fx:id="entrada" prefHeight="375.0" prefWidth="800.0" />
+      <Button layoutX="317.0" layoutY="388.0" mnemonicParsing="false" onMouseClicked="#validar" text="Validar" />
+      <Button layoutX="435.0" layoutY="388.0" mnemonicParsing="false" onMouseClicked="#limpiar" text="Limpiar" />
+      <TextArea fx:id="resultado" editable="false" layoutY="425.0" prefHeight="375.0" prefWidth="800.0" />
+      <Label fx:id="estatus" layoutX="526.0" layoutY="391.0" prefHeight="17.0" prefWidth="260.0" />
+   </children>
+</AnchorPane>
