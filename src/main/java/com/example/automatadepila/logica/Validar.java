@@ -33,7 +33,10 @@ public class Validar {
         productions.put("SP", "PARC COF");
         productions.put("COF", "CORI CONF");
         productions.put("CONF", "CONTENIDOF+ CORC");
-        productions.put("CONTENIDOF", "contenidof");
+        productions.put("CONTENIDOF", "L+ M | PRP PI");
+        productions.put("PI", "PARI PFP");
+        productions.put("PFP", "DAP+ PARC");
+        productions.put("DAP", "L+ C? | ST C?");
         productions.put("M", "VA* X");
         productions.put("VA", "C L+");
         productions.put("X", "E S");
@@ -57,6 +60,7 @@ public class Validar {
         productions.put("PRF", "func");
         productions.put("PRC", "class");
         productions.put("PRM", "main");
+        productions.put("PRP", "println | print");
     }
     private String respuesta = "";
 
@@ -74,6 +78,7 @@ public class Validar {
         int nPalabras = 0;
         int ncontenidosC = 0;
         int ncontenidosF = 0;
+        int nDats = 0;
 
         stack.clear();
 
@@ -110,13 +115,61 @@ public class Validar {
                     respuesta += stack + "\n";
                     resultado.setText(respuesta);
                     i++;
-                }else if(X.equals("CONTENIDOF+")){
-                    if (words[i].matches("contenidof")){
-                        stack.pop();
-                        stack.push("CONTENIDOF");
-                        ncontenidosF++;
+                }else if(X.equals("C?")){
+                    stack.pop();
+                    if (Pattern.matches("\\,", words[i])){
+                        stack.push("C");
+                    } else {
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
+                        return ("Cadena no valida");
+                    }
+                    respuesta += stack + "\n";
+                    resultado.setText(respuesta);
+                }else if(X.equals("DAP+")){
+                    if(Character.isLetter(words[i].charAt(0))){
+                        
+                        if (words[i+1].matches(getProduction("C"))){
+                            stack.push("C?");
+                        } else {
+                            stack.pop();
+                        }
+                        stack.push("L+");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    }else if(words[i].matches(getProduction("COMILLAS"))){
+                        stack.push("C?");
+                        stack.push("ST");
+                        stack.push("COMILLAS");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    }else{
+                        if(nDats == 0){
+                            respuesta += stack + "\n";
+                            resultado.setText(respuesta);
+                            return ("Cadena no valida");
+                        }
+                        stack.pop();
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    }
+                }else if(X.equals("CONTENIDOF+")){
+                    if (words[i].matches("println")){
+                        stack.push("PI");
+                        stack.push("println");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    }else if (words[i].matches("print")){
+                        stack.push("PI");
+                        stack.push("print");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    }else if (Character.isLetter(words[i].charAt(0))){
+                        stack.push("M");
+                        stack.push("L+");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                        ncontenidosF++;
                     }else if(ncontenidosF == 0){
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
@@ -242,8 +295,8 @@ public class Validar {
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
                     }else if (Character.isLetter(words[i].charAt(0))){
-                        stack.push("L+");
                         stack.push("M");
+                        stack.push("L+");
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
                         ncontenidosC++;
