@@ -25,9 +25,9 @@ public class Validar {
         productions.put("FC", "FN COF");
         productions.put("FN", "L+ PAIF");
         productions.put("PAIF", "PARI PACF");
-        productions.put("PACF", "PF? PARC");
-        productions.put("MF", "C L+");
-        productions.put("PF", "L+ MF*");
+        productions.put("PACF", "PARAMS PARC");
+        productions.put("PARAMS", "L+ PF| L+");
+        productions.put("PF", "C PARAMS");
         productions.put("FCM", "PRM FMP");
         productions.put("FMP", "PARI SP");
         productions.put("SP", "PARC COF");
@@ -103,8 +103,6 @@ public class Validar {
             if (X.equals("$")) {
                 return ("La cadena es aceptada");
             }
-            System.out.println(stack);
-            System.out.println(X);
             
             if (isTerminal(X)) {
                 if (X != null && (Pattern.matches(X, words[i]) || X.matches(words[i]))) {
@@ -129,10 +127,6 @@ public class Validar {
                         ncontenidosF = 0;
                         stack.pop();
                     }
-                }else if(X.equals("PF?")){
-
-                }else if(X.equals("MF*")){
-
                 }else if(X.equals("L+")){
                     String cadena = words[i];
                     for (int j = 0; j < cadena.length(); j++) {
@@ -272,9 +266,6 @@ public class Validar {
                 }
             } else { // X is not terminal
                 if (X.equals("SC")){
-                    String productions = getProduction("SC");
-                    String[] production = productions.split("\\|");
-                    String[] symbols0 = production[0].split("\\s+");
                     if (words[i+1].equals("main")){
                         stack.pop();
                         stack.push("CLM");
@@ -287,6 +278,33 @@ public class Validar {
                         stack.push("PRC");
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
+                    }
+                }else if(X.equals("PARAMS")){
+                    if (Character.isLetter(words[i].charAt(0))){
+                        stack.pop();
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                        stack.push("L+");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                        stack.pop();
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                        i++;
+                        if (words[i].equals(getProduction("C"))){
+                            stack.push("PARAMS");
+                            respuesta += stack + "\n";
+                            resultado.setText(respuesta);
+                            i++;
+                        }
+                    } else if (!Character.isLetter(words[i].charAt(0))){
+                        stack.pop();
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                    } else {
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+                        return ("Cadena no valida");
                     }
                 }else if(X.equals("PALABRAS")){
                     String productions = getProduction("PALABRAS");
