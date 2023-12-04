@@ -148,8 +148,9 @@ public class Validar {
         resultado.setText(respuesta);
 
         while (true) {
-            X = stack.peek();
-
+            try{
+                X = stack.peek();
+            
             if (X.equals("$")) {
                 return ("La cadena es aceptada");
             }
@@ -583,6 +584,9 @@ public class Validar {
                     resultado.setText(respuesta);
                     return ("Error");
                 }
+            }
+            }catch (Exception e) {
+                return ("Cadena no valida");
             }
         }
     }
