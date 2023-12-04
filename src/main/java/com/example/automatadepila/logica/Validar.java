@@ -33,7 +33,12 @@ public class Validar {
         productions.put("SP", "PARC COF");
         productions.put("COF", "CORI CONF");
         productions.put("CONF", "CONTENIDOF+ CORC");
-        productions.put("CONTENIDOF", "L+ M | PRP PI | PRI GV | PRSQ ISQ | CONW COF | DCON CONW");
+        productions.put("CONTENIDOF", "L+ M | PRP PI | PRI GV | PRSQ ISQ | CONW COF | DCON CONW | SS EISCS");
+        productions.put("EISCS", "EISC* ESC?");
+        productions.put("EISC", "PRELSIF CSC");
+        productions.put("ESC", "PRELSE COF");
+        productions.put("SS", "PRIF CSC");
+        productions.put("CSC", "CON COF");
         productions.put("DCON", "PRD COF");
         productions.put("CONW", "PRW CON");
         productions.put("CON", "PARI COND");
@@ -76,6 +81,9 @@ public class Validar {
         productions.put("PRSQ", "sqrt");
         productions.put("PRW", "while");
         productions.put("PRD", "do");
+        productions.put("PRIF", "if");
+        productions.put("PRELSE", "else");
+        productions.put("PRELSIF", "elsif");
     }
     private String respuesta = "";
 
@@ -168,7 +176,13 @@ public class Validar {
                         resultado.setText(respuesta);
                     }
                 }else if(X.equals("CONTENIDOF+")){
-                    if(words[i].matches("while")){
+                    if(words[i].matches("if")){
+                        stack.push("EISCS");
+                        stack.push("SS");
+                        respuesta += stack + "\n";
+                        resultado.setText(respuesta);
+
+                    }else if(words[i].matches("while")){
                         stack.push("COF");
                         stack.push("CONW");
                         respuesta += stack + "\n";
@@ -361,6 +375,21 @@ public class Validar {
                         stack.push("PRC");
                         respuesta += stack + "\n";
                         resultado.setText(respuesta);
+                    }
+                }else if(X.equals("EISC*")){
+                    if(words[i].equals("elsif")){
+                        stack.push("CSC");
+                        stack.push("PRELSIF");
+                    } else{
+                        stack.pop();
+                    }
+                    respuesta += stack + "\n";
+                    resultado.setText(respuesta);
+                }else if(X.equals("ESC*")){
+                    stack.pop();
+                    if(words[i].equals("else")){
+                        stack.push("COF");
+                        stack.push("PRELSE");
                     }
                 }else if(X.equals("EE")){
                     stack.pop();
